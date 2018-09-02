@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -31,6 +31,7 @@ enum WalletErrorCodes {
   WRONG_PASSWORD,
   INTERNAL_WALLET_ERROR,
   MIXIN_COUNT_TOO_BIG,
+MIXIN_COUNT_TOO_SMALL,
   BAD_ADDRESS,
   TRANSACTION_SIZE_TOO_BIG,
   WRONG_AMOUNT,
@@ -76,6 +77,7 @@ public:
     case WRONG_PASSWORD:                return "The password is wrong";
     case ALREADY_INITIALIZED:           return "The object is already initialized";
     case INTERNAL_WALLET_ERROR:         return "Internal error occurred";
+  case MIXIN_COUNT_TOO_SMALL:           return "MixIn count is below the required minimum";
     case MIXIN_COUNT_TOO_BIG:           return "MixIn count is too big";
     case BAD_ADDRESS:                   return "Bad address";
     case TRANSACTION_SIZE_TOO_BIG:      return "Transaction size is too big";

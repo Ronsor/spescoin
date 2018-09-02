@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "TransfersConsumer.h"
 
@@ -130,7 +130,9 @@ ITransfersSubscription& TransfersConsumer::addSubscription(const AccountSubscrip
     m_spendKeys.insert(subscription.keys.address.spendPublicKey);
 
     if (m_subscriptions.size() == 1) {
-      m_syncStart = res->getSyncStart();
+    auto subStart = res->getSyncStart();
+    m_syncStart.height = std::min(m_syncStart.height, subStart.height);
+    m_syncStart.timestamp = std::min(m_syncStart.timestamp, subStart.timestamp);
     } else {
       auto subStart = res->getSyncStart();
       m_syncStart.height = std::min(m_syncStart.height, subStart.height);
