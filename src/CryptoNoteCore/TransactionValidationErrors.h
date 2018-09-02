@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -28,6 +28,8 @@ enum class TransactionValidationError {
   EMPTY_INPUTS,
   INPUT_UNKNOWN_TYPE,
   INPUT_EMPTY_OUTPUT_USAGE,
+  INPUT_INVALID_DOMAIN_KEYIMAGES,
+  MIXIN_COUNT_TOO_SMALL,
   INPUT_IDENTICAL_KEYIMAGES,
   INPUT_IDENTICAL_OUTPUT_INDEXES,
   INPUT_KEYIMAGE_ALREADY_SPENT,
@@ -69,6 +71,8 @@ public:
       case TransactionValidationError::EMPTY_INPUTS: return "Transaction has no inputs";
       case TransactionValidationError::INPUT_UNKNOWN_TYPE: return "Transaction has input with unknown type";
       case TransactionValidationError::INPUT_EMPTY_OUTPUT_USAGE: return "Transaction's input uses empty output";
+      case TransactionValidationError::INPUT_INVALID_DOMAIN_KEYIMAGES: return "Transaction uses key image not in the valid domain";
+      case TransactionValidationError::MIXIN_COUNT_TOO_SMALL: return "MixIn count is below the required minimum";
       case TransactionValidationError::INPUT_IDENTICAL_KEYIMAGES: return "Transaction has identical key images";
       case TransactionValidationError::INPUT_IDENTICAL_OUTPUT_INDEXES: return "Transaction has identical output indexes";
       case TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT: return "Transaction uses spent key image";
