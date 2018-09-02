@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Miner.h"
 
@@ -38,7 +38,7 @@ Miner::~Miner() {
   assert(m_state != MiningState::MINING_IN_PROGRESS);
 }
 
-BlockTemplate Miner::mine(const BlockMiningParameters& blockMiningParameters, size_t threadCount) {
+BlockTemplate Miner::mine(const BlockMiningParameters& blockMiningParameters, size_t threadCount, uint32_t cryptonightVariant) {
   if (threadCount == 0) {
     throw std::runtime_error("Miner requires at least one thread");
   }
@@ -50,7 +50,7 @@ BlockTemplate Miner::mine(const BlockMiningParameters& blockMiningParameters, si
   m_state = MiningState::MINING_IN_PROGRESS;
   m_miningStopped.clear();
 
-  runWorkers(blockMiningParameters, threadCount);
+runWorkers(blockMiningParameters, threadCount, cryptonightVariant);
 
   assert(m_state != MiningState::MINING_IN_PROGRESS);
   if (m_state == MiningState::MINING_STOPPED) {
@@ -71,7 +71,7 @@ void Miner::stop() {
   }
 }
 
-void Miner::runWorkers(BlockMiningParameters blockMiningParameters, size_t threadCount) {
+void Miner::runWorkers(BlockMiningParameters blockMiningParameters, size_t threadCount, uint32_t cryptonightVariant) {
   assert(threadCount > 0);
 
   m_logger(Logging::INFO) << "Starting mining for difficulty " << blockMiningParameters.difficulty;
@@ -81,7 +81,7 @@ void Miner::runWorkers(BlockMiningParameters blockMiningParameters, size_t threa
 
     for (size_t i = 0; i < threadCount; ++i) {
       m_workers.emplace_back(std::unique_ptr<System::RemoteContext<void>> (
-        new System::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, threadCount)))
+        new System::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, threadCount, cryptonightVariant)))
       );
 
       blockMiningParameters.blockTemplate.nonce++;
@@ -97,14 +97,14 @@ void Miner::runWorkers(BlockMiningParameters blockMiningParameters, size_t threa
   m_miningStopped.set();
 }
 
-void Miner::workerFunc(const BlockTemplate& blockTemplate, Difficulty difficulty, uint32_t nonceStep) {
+void Miner::workerFunc(const BlockTemplate& blockTemplate, Difficulty difficulty, uint32_t nonceStep, uint32_t cryptonightVariant) {
   try {
     BlockTemplate block = blockTemplate;
     Crypto::cn_context cryptoContext;
 
     while (m_state == MiningState::MINING_IN_PROGRESS) {
       CachedBlock cachedBlock(block);
-      Crypto::Hash hash = cachedBlock.getBlockLongHash(cryptoContext);
+      Crypto::Hash hash = cachedBlock.getBlockLongHash(cryptoContext, cryptonightVariant);
       if (check_hash(hash, difficulty)) {
         m_logger(Logging::INFO) << "Found block for difficulty " << difficulty;
 
