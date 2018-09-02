@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "WalletLegacy.h"
 
@@ -173,7 +173,10 @@ void WalletLegacy::initWithKeys(const AccountKeys& accountKeys, const std::strin
     }
 
     m_account.setAccountKeys(accountKeys);
-    m_account.set_createtime(ACCOUN_CREATE_TIME_ACCURACY);
+  uint64_t createTime = ACCOUN_CREATE_TIME_ACCURACY;
+  if (m_syncAll == 1)
+    createTime = 0;
+  m_account.set_createtime(createTime);
     m_password = password;
 
     initSync();
@@ -205,7 +208,6 @@ void WalletLegacy::initSync() {
   sub.syncStart.timestamp = m_account.get_createtime() - ACCOUN_CREATE_TIME_ACCURACY;
   if (m_syncAll == 1)
     sub.syncStart.timestamp = 0;
-  std::cout << "Sync from timestamp: " << sub.syncStart.timestamp << std::endl;
   
   auto& subObject = m_transfersSync.addSubscription(sub);
   m_transferDetails = &subObject.getContainer();
