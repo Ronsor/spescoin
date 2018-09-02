@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <fstream>
 
@@ -65,8 +65,11 @@ namespace
   const command_line::arg_descriptor<std::string> arg_log_file    = {"log-file", "", ""};
   const command_line::arg_descriptor<int>         arg_log_level   = {"log-level", "", 2}; // info level
   const command_line::arg_descriptor<bool>        arg_console     = {"no-console", "Disable daemon console commands"};
+  const command_line::arg_descriptor<std::string> arg_set_fee_address = { "fee-address", "Sets fee address for light wallets to the daemon's RPC responses.", "" };
   const command_line::arg_descriptor<bool>        arg_print_genesis_tx = { "print-genesis-tx", "Prints genesis' block tx hex to insert it to config and exits" };
   const command_line::arg_descriptor<std::vector<std::string>> arg_genesis_block_reward_address = { "genesis-block-reward-address", "" };
+  const command_line::arg_descriptor<bool> arg_blockexplorer_on = {"enable-blockexplorer", "Enable blockchain explorer RPC", false};
+  const command_line::arg_descriptor<std::vector<std::string>>        arg_enable_cors = { "enable-cors", "Adds header 'Access-Control-Allow-Origin' to the daemon's RPC responses. Uses the value as domain. Use * for all" };
   const command_line::arg_descriptor<bool>        arg_testnet_on  = {"testnet", "Used to deploy test nets. Checkpoints and hardcoded seeds are ignored, "
     "network id is changed. Use it with --data-dir flag. The wallet must be launched with --testnet flag.", false};
 }
@@ -76,6 +79,8 @@ void print_genesis_tx_hex(const po::variables_map& vm, LoggerManager& logManager
   std::vector<CryptoNote::AccountPublicAddress> targets;
   auto genesis_block_reward_addresses = command_line::get_arg(vm, arg_genesis_block_reward_address);
   CryptoNote::CurrencyBuilder currencyBuilder(logManager);
+bool blockexplorer_mode = command_line::get_arg(vm, arg_blockexplorer_on);
+currencyBuilder.isBlockexplorer(blockexplorer_mode);
   CryptoNote::Currency currency = currencyBuilder.currency();
   for (const auto& address_string : genesis_block_reward_addresses) {
      CryptoNote::AccountPublicAddress address;
@@ -146,7 +151,10 @@ int main(int argc, char* argv[])
     command_line::add_arg(desc_cmd_sett, arg_log_file);
     command_line::add_arg(desc_cmd_sett, arg_log_level);
     command_line::add_arg(desc_cmd_sett, arg_console);
+    command_line::add_arg(desc_cmd_sett, arg_set_fee_address);
     command_line::add_arg(desc_cmd_sett, arg_testnet_on);
+command_line::add_arg(desc_cmd_sett, arg_enable_cors);
+    command_line::add_arg(desc_cmd_sett, arg_blockexplorer_on);
 command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
   command_line::add_arg(desc_cmd_sett, arg_genesis_block_reward_address);
 
@@ -225,6 +233,8 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
 
     //create objects and link them
     CryptoNote::CurrencyBuilder currencyBuilder(logManager);
+bool blockexplorer_mode = command_line::get_arg(vm, arg_blockexplorer_on);
+currencyBuilder.isBlockexplorer(blockexplorer_mode);
     currencyBuilder.testnet(testnet_mode);
     try {
       currencyBuilder.currency();
@@ -309,6 +319,8 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
 
     logger(INFO) << "Starting core rpc server on address " << rpcConfig.getBindAddress();
     rpcServer.start(rpcConfig.bindIp, rpcConfig.bindPort);
+  rpcServer.setFeeAddress(command_line::get_arg(vm, arg_set_fee_address));
+rpcServer.enableCors(command_line::get_arg(vm, arg_enable_cors));
     logger(INFO) << "Core rpc server started ok";
 
     Tools::SignalHandler::install([&dch, &p2psrv] {

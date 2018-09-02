@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "CryptoNoteProtocolHandler.h"
 
@@ -335,6 +335,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_block(int command, NOTIFY_NEW_B
       logger(Logging::TRACE) << context << "Block already exists";
     }
   } else if (result == error::AddBlockErrorCondition::BLOCK_REJECTED) {
+    m_p2p->drop_connection(context, true);
     context.m_state = CryptoNoteConnectionContext::state_synchronizing;
     NOTIFY_REQUEST_CHAIN::request r = boost::value_initialized<NOTIFY_REQUEST_CHAIN::request>();
     r.block_ids = m_core.buildSparseChain();
@@ -689,7 +690,12 @@ void CryptoNoteProtocolHandler::updateObservedHeight(uint32_t peerHeight, const 
     std::lock_guard<std::mutex> lock(m_observedHeightMutex);
 
     uint32_t height = m_observedHeight;
-    if (peerHeight > context.m_remote_blockchain_height) {
+    if (context.m_remote_blockchain_height != 0 && context.m_last_response_height <= context.m_remote_blockchain_height) {
+      m_observedHeight = context.m_remote_blockchain_height ;
+      if (m_observedHeight != height) {
+        updated = true;
+      }
+    } else if (peerHeight > context.m_remote_blockchain_height) {
       m_observedHeight = std::max(m_observedHeight, peerHeight);
       if (m_observedHeight != height) {
         updated = true;
@@ -719,6 +725,9 @@ void CryptoNoteProtocolHandler::recalculateMaxObservedHeight(const CryptoNoteCon
   });
 
   m_observedHeight = std::max(peerHeight, m_core.getTopBlockIndex() + 1);
+    if (context.m_state == CryptoNoteConnectionContext::state_normal) {
+      m_observedHeight = m_core.getTopBlockIndex();
+    }
 }
 
 uint32_t CryptoNoteProtocolHandler::getObservedHeight() const {
