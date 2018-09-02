@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "CachedBlock.h"
 #include <Common/Varint.h>
@@ -57,16 +57,16 @@ const Crypto::Hash& CachedBlock::getBlockHash() const {
   return blockHash.get();
 }
 
-const Crypto::Hash& CachedBlock::getBlockLongHash(cn_context& cryptoContext) const {
+const Crypto::Hash& CachedBlock::getBlockLongHash(cn_context& cryptoContext, uint32_t variant) const {
   if (!blockLongHash.is_initialized()) {
     if (block.majorVersion == BLOCK_MAJOR_VERSION_1) {
       const auto& rawHashingBlock = getBlockHashingBinaryArray();
       blockLongHash = Hash();
-      cn_slow_hash(cryptoContext, rawHashingBlock.data(), rawHashingBlock.size(), blockLongHash.get());
+      cn_slow_hash(cryptoContext, rawHashingBlock.data(), rawHashingBlock.size(), blockLongHash.get(), variant);
     } else if (block.majorVersion >= BLOCK_MAJOR_VERSION_2) {
       const auto& rawHashingBlock = getParentBlockHashingBinaryArray(true);
       blockLongHash = Hash();
-      cn_slow_hash(cryptoContext, rawHashingBlock.data(), rawHashingBlock.size(), blockLongHash.get());
+      cn_slow_hash(cryptoContext, rawHashingBlock.data(), rawHashingBlock.size(), blockLongHash.get(), variant);
     } else {
       throw std::runtime_error("Unknown block major version.");
     }
