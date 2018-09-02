@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "WalletService.h"
 
@@ -194,7 +194,9 @@ std::vector<CryptoNote::TransactionsInBlockInfo> filterTransactions(
       }
     }
 
-    result.push_back(std::move(item));
+    if (!block.transactions.empty()) {
+      result.push_back(std::move(item));
+    }
   }
 
   return result;
@@ -265,6 +267,13 @@ std::vector<PaymentService::TransactionHashesInBlockRpcInfo> convertTransactions
   }
 
   return transactionHashes;
+}
+
+void validateMixin(const uint16_t& mixin, const CryptoNote::Currency& currency, Logging::LoggerRef logger) {
+  if (mixin < currency.minMixin()) {
+    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin must be equal or bigger to " << currency.minMixin();
+    throw std::system_error(make_error_code(CryptoNote::error::MIXIN_COUNT_TOO_SMALL));
+  }
 }
 
 void validateAddresses(const std::vector<std::string>& addresses, const CryptoNote::Currency& currency, Logging::LoggerRef logger) {
@@ -832,6 +841,7 @@ std::error_code WalletService::sendTransaction(const SendTransaction::Request& r
       validateAddresses({ request.changeAddress }, currency, logger);
     }
 
+validateMixin(request.anonymity, currency, logger);
     CryptoNote::TransactionParameters sendParams;
     if (!request.paymentId.empty()) {
       addPaymentIdToExtra(request.paymentId, sendParams.extra);
@@ -871,6 +881,7 @@ std::error_code WalletService::createDelayedTransaction(const CreateDelayedTrans
       validateAddresses({ request.changeAddress }, currency, logger);
     }
 
+validateMixin(request.anonymity, currency, logger);
     CryptoNote::TransactionParameters sendParams;
     if (!request.paymentId.empty()) {
       addPaymentIdToExtra(request.paymentId, sendParams.extra);
