@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -82,6 +82,8 @@ struct EllipticCurveScalar {
     friend bool check_signature(const Hash &, const PublicKey &, const Signature &);
     static void generate_key_image(const PublicKey &, const SecretKey &, KeyImage &);
     friend void generate_key_image(const PublicKey &, const SecretKey &, KeyImage &);
+    static KeyImage scalarmultKey(const KeyImage & P, const KeyImage & a);
+    friend KeyImage scalarmultKey(const KeyImage & P, const KeyImage & a);
     static void hash_data_to_ec(const uint8_t*, std::size_t, PublicKey&);
     friend void hash_data_to_ec(const uint8_t*, std::size_t, PublicKey&);
     static void generate_ring_signature(const Hash &, const KeyImage &,
@@ -217,6 +219,10 @@ struct EllipticCurveScalar {
    */
   inline void generate_key_image(const PublicKey &pub, const SecretKey &sec, KeyImage &image) {
     crypto_ops::generate_key_image(pub, sec, image);
+  }
+
+  inline KeyImage scalarmultKey(const KeyImage & P, const KeyImage & a) {
+    return crypto_ops::scalarmultKey(P, a);
   }
 
   inline void hash_data_to_ec(const uint8_t* data, std::size_t len, PublicKey& key) {

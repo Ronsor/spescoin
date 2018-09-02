@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers, SpesCoin dev's
 //
 // This file is part of Bytecoin.
 //
@@ -7,13 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// SpesCoin is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with SpesCoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -55,11 +55,11 @@ namespace Crypto {
   private:
 
     void *data;
-    friend inline void cn_slow_hash(cn_context &, const void *, size_t, Hash &);
+      friend inline void cn_slow_hash(cn_context &, const void *, size_t, Hash &, int);
   };
 
-  inline void cn_slow_hash(cn_context &context, const void *data, size_t length, Hash &hash) {
-    (*cn_slow_hash_f)(context.data, data, length, reinterpret_cast<void *>(&hash));
+    inline void cn_slow_hash(cn_context &context, const void *data, size_t length, Hash &hash, int variant = 0) {
+      (*cn_slow_hash_f)(context.data, data, length, reinterpret_cast<void *>(&hash), variant);
   }
 
   inline void tree_hash(const Hash *hashes, size_t count, Hash &root_hash) {
