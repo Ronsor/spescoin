@@ -12,6 +12,8 @@ Alternatively, it may be possible to install them using a package manager.
 
 To build, change to a directory where this file is located, and run `make'. The resulting executables can be found in build/release/src.
 
+If you get access denied during the build proccess, please navigate to the file location and run the following command: chmod +x name_of_the_file
+
 Advanced options:
 Parallel build: run `make -j<number of threads>' instead of `make'.
 Debug build: run `make build-debug'.
