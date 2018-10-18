@@ -16,8 +16,8 @@ sudo apt-get update
 sudo apt-get -y git install build-essential gcc g++ git cmake libboost-all-dev
 git clone https://github.com/SpesCoin/spescoin
 cd spescoin
-chmod +x root/spescoin/external/rocksdb/build_tools/build_detect_platform
-chmod +x root/spescoin/external/rocksdb/build_tools/version.sh
+chmod +x external/rocksdb/build_tools/build_detect_platform
+chmod +x external/rocksdb/build_tools/version.sh
 export CXXFLAGS="-std=gnu++11"
 export CXXFLAGS="-std=c++11"
 make
