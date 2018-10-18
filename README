@@ -10,9 +10,18 @@ http://www.cmake.org/
 http://www.boost.org/
 Alternatively, it may be possible to install them using a package manager.
 
-To build, change to a directory where this file is located, and run `make'. The resulting executables can be found in build/release/src.
+To build SpesCoin from source code use the below commands, The resulting executables can be found in build/release/src.
 
-If you get access denied during the build proccess, please navigate to the file location and run the following command: chmod +x name_of_the_file
+sudo apt-get update
+sudo apt-get -y git install build-essential gcc g++ git cmake libboost-all-dev
+git clone https://github.com/SpesCoin/spescoin
+cd spescoin
+chmod +x root/spescoin/external/rocksdb/build_tools/build_detect_platform
+chmod +x root/spescoin/external/rocksdb/build_tools/version.sh
+export CXXFLAGS="-std=gnu++11"
+export CXXFLAGS="-std=c++11"
+make
+(optinal you can run make -j 6 )
 
 Advanced options:
 Parallel build: run `make -j<number of threads>' instead of `make'.
