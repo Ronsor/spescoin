@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <list>
 #include <vector>
+#include <functional>
 
 #ifdef OS_LINUX
 #include <sys/mman.h>
